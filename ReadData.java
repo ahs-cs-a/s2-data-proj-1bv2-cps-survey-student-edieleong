@@ -58,14 +58,16 @@ public class ReadData{
     public double[] stdDeviation(double[][] xy){
         double[] stdDeviation = new double[2];
         double[] mean = mean(xy);
+        double variancea = 0;
+        double varianceb = 0;
         for(int i = 0; i < xy.length; i++){
-            double variance = 0;
-            for(int j = 0; j < xy.length; j++){
-                variance += Math.pow(xy[j][i] - mean[i]);
-            }
-            variance = variance / (xy.length - 1);
-            stdDeviation[i] = Math.sqrt(variance);
+            variancea += Math.pow(xy[i][0] - mean[0], 2);
+            varianceb += Math.pow(xy[i][1] - mean[1], 2);
         }
+        variancea = variancea / (xy.length - 1);
+        varianceb = varianceb / (xy.length - 1);
+        stdDeviation[0] = Math.sqrt(variancea);
+        stdDeviation[1] = Math.sqrt(varianceb);
         return stdDeviation; //sample variance!
     }
     
@@ -74,13 +76,14 @@ public class ReadData{
     //of values
     public double[] mean(double[][] xy){
         double[] mean = new double[2];
-        for(int i = 0; i < xy[0].length; i++){
-            double sum = 0;
-            for(int j = 0; j < xy.length; j++){
-                sum += xy[j][i];
-            }
-            mean[i] = sum / xy.length;
+        double suma = 0;
+        double sumb = 0;
+        for(int i = 0; i < xy.length; i++){
+            suma += xy[i][0];
+            sumb += xy[i][1];
         }
+        mean[0] = suma / xy.length;
+        mean[1] = sumb / xy.length;
         return mean;
     }
 
@@ -88,10 +91,13 @@ public class ReadData{
     //the standard units are the value minus the mean divided by the standard deviation
     //this should return a double 2D array of the standard units
     public double[][] standardUnits(double[][] xy){
-        double[][] stdArr = ...
-        double[] stdDeviation = ...;
-        double[] mean = ...;
-        ...
+        double[][] stdArr = new double[xy.length][2];
+        double[] stdDeviation = stdDeviation(xy);
+        double[] mean = mean(xy);
+        for(int i = 0; i < xy.length; i++){
+            stdArr[i][0] = (xy[i][0] - mean[0]) / stdDeviation[0];
+            stdArr[i][1] = (xy[i][1] - mean[1]) / stdDeviation[1];
+        }
         return stdArr;
     }
     
@@ -104,22 +110,24 @@ public class ReadData{
     //the correlation is between -1 and 1
     public double correlation(double[][] xy){
         double sum = 0;
-        ...
-        return ...;    
+        for(int i = 0; i < xy.length; i++){
+            sum += xy[i][0] * xy[i][1];
+        }
+        return sum / (xy.length - 1);    
     }
     
     public void runRegression(){
-        // double[][] xy = getColumns(7,9);
-        // double[][] xyStd = standardUnits(xy);
-        // double correlation = correlation(xyStd);
-        // double slope = correlation * xyStd[1] / xyStd[0];
-        // double[] means = mean(xy)
-        // double intercept = means[1] - slope * means[0];
-        // System.out.println("Correlation: " + correlation);
-        // System.out.println("Slope: " + slope);
-        // System.out.println("Intercept: " + intercept);
-        // Scatter s = new Scatter();
-        // s.displayScatterPlot(xy[0], xy[1]);
+        double[][] xy = getColumns(7,9);
+        double[] xyStd = stdDeviation(xy);
+        double correlation = correlation(xy);
+        double slope = correlation * xyStd[1] / xyStd[0];
+        double[] means = mean(xy);
+        double intercept = means[1] - slope * means[0];
+        System.out.println("Correlation: " + correlation);
+        System.out.println("Slope: " + slope);
+        System.out.println("Intercept: " + intercept);
+        Scatter s = new Scatter();
+        s.displayScatterPlot(xy[0], xy[1]);
     }
 
     //this prints the array passed in - you may want this for debugging
